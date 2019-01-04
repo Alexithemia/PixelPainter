@@ -159,15 +159,16 @@ const pixelPaint = (function () {
     for (let i = 0; i < pixels.length; i++) {
       storedArr.push(pixels[i])
     }
+    console.log(storedArr[0])
   }
 
   function loadPic() {
     let pixels = document.getElementsByClassName('canvasCell');
     if (storedArr[1]) {
-      console.log(pixels[0])
-      console.log(storedArr[0])
+      console.log('current' + pixels[0])
+      console.log('stored' + storedArr[0])
       for (let i = 0; i < pixels.length; i++) {
-        pixels[i] = storedArr[i]
+        // pixels[i] = storedArr[i]
       }
     }
   }
