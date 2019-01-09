@@ -1,184 +1,70 @@
 const pixelPaint = (function () {
-  //variables
-  let pixelBody = document.getElementById('pixelPainter');
-  let slctColor;
-  let mouseDown = false;
-  let storedArr = [];
+  let pixelPainter = document.getElementById('pixelPainter');
+  let canvas = document.createElement('canvas');
+  canvas.id = 'canvas'
+  canvas.class = 'canvas'
+  canvas.height = '500';
+  canvas.width = '500'
+  pixelPainter.appendChild(canvas);
+  if (typeof G_vmlCanvasManager != 'undefined') {
+    canvas = G_vmlCanvasManager.initElement(canvas);
+  }
+  context = canvas.getContext("2d");
 
-  //invokes grid generator to make a grid for the canvas and palette
-  genGrid(100, 100, 'canvas');
-  genGrid(10, 7, 'palette');
+  canvas = document.getElementById('canvas');
+  canvas.addEventListener('mousedown', function (e) {
+    console.log('hit')
+    var mouseX = e.pageX - this.offsetLeft;
+    var mouseY = e.pageY - this.offsetTop;
 
-  //creating and appending box for buttons
-  let btnBox = document.createElement('div');
-  btnBox.className = 'buttonBox';
-  let palette = document.getElementsByClassName('palette');
-  palette[0].appendChild(btnBox);
+    paint = true;
+    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+    redraw();
+  });
 
-  //events
-  document.onmousedown = function () {
-    mouseDown = true;
-  };
+  canvas.addEventListener('mousemove', (function (e) {
+    if (paint) {
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+      redraw();
+    }
+  }));
 
-  document.onmouseup = function () {
-    mouseDown = false;
-  };
+  canvas.addEventListener('mouseup', (function (e) {
+    paint = false;
+  }));
 
-  document.onmouseover = function (event) {
-    colorDrag(event.target);
-  };
-  document.body.onmousedown = function (event) {
-    clicked(event.target);
-  };
+  canvas.addEventListener('mouseleave', (function (e) {
+    paint = false;
+  }));
 
-  //functions
-  //generates and appends a grid with given size and class name
-  function genGrid(r, c, name) {
-    let grid = document.createElement('div');
-    grid.className = name;
-    pixelBody.appendChild(grid);
-    for (let i = 0; i < r; i++) {
-      let row = document.createElement('div');
-      row.className = name + 'Row';
-      for (let j = 1; j <= c; j++) {
-        let cell = document.createElement('div');
-        cell.className = name + 'Cell';
-        cell.dataset.y = i;
-        cell.dataset.x = j;
-        row.appendChild(cell);
+  var clickX = new Array();
+  var clickY = new Array();
+  var clickDrag = new Array();
+  var paint;
+
+  function addClick(x, y, dragging) {
+    clickX.push(x);
+    clickY.push(y);
+    clickDrag.push(dragging);
+  }
+
+  function redraw() {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+
+    context.strokeStyle = "#df4b26";
+    context.lineJoin = "round";
+    context.lineWidth = 5;
+
+    for (var i = 0; i < clickX.length; i++) {
+      context.beginPath();
+      if (clickDrag[i] && i) {
+        context.moveTo(clickX[i - 1], clickY[i - 1]);
+      } else {
+        context.moveTo(clickX[i] - 1, clickY[i]);
       }
-      grid.appendChild(row);
+      context.lineTo(clickX[i], clickY[i]);
+      context.closePath();
+      context.stroke();
     }
   }
-
-  //makes a button with a given id
-  function mkBtn(name) {
-    let btn = document.createElement('div');
-    btn.className = 'button';
-    btn.id = name;
-    btn.innerHTML = name;
-    btnBox.appendChild(btn);
-  }
-
-  //creates colors and changes palette grid background to them
-  function mkColors() {
-    let colorCells = document.getElementsByClassName('paletteCell')
-    let count = 0;
-    for (let r = 0; r <= 255; r += 85) {
-      for (let g = 0; g <= 255; g += 85) {
-        for (let b = 0; b <= 255; b += 85) {
-          colorCells[count].style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
-          count++
-        }
-      }
-    }
-    for (let i = 213; i > 0; i -= 42) {
-      colorCells[count].style.background = 'rgb(' + i + ',' + i + ',' + i + ')';
-      count++
-    }
-  }
-
-  //if mouse is down and moved over a canvas cell, colors that cell with chosen color.
-  function colorDrag(e) {
-    if (mouseDown && e.className === 'canvasCell') {
-      e.style.backgroundColor = slctColor;
-    }
-  }
-
-  //colors a cell with chosen color when clicked
-  function colorClick(e) {
-    if (e.className === 'canvasCell') {
-      e.style.backgroundColor = slctColor;
-    }
-  }
-
-  //checks clicked element class name and switches operation accordingly
-  function clicked(e) {
-    switch (e.className) {
-      case 'canvasCell':
-        colorClick(e);
-        break;
-      case 'paletteCell':
-        selectColor(e);
-        break;
-      case 'button':
-        buttons(e);
-        break;
-    }
-  }
-
-  //assigns color variable to be the same as the palette color clicked
-  function selectColor(e) {
-    slctColor = e.style.backgroundColor
-  }
-
-  //checks id of clicked button and switches operation accordingly
-  function buttons(e) {
-    switch (e.id) {
-      case 'erase':
-        erase();
-        break;
-      case 'square':
-        break;
-      case 'triangle':
-        break;
-      case 'circle':
-        break;
-      case 'save':
-        console.log('save');
-
-        savePic();
-        break;
-      case 'load':
-        console.log('load');
-
-        loadPic();
-        break;
-      case 'clear':
-        clrGrid();
-        break;
-    }
-  }
-
-  //changes selected color to the default color to remove colors on grid
-  function erase() {
-    slctColor = 'rgb(255, 255, 255)';
-  }
-
-  //reverts entire grid to chosen default color
-  function clrGrid() {
-    let allCells = document.getElementsByClassName('canvasCell')
-    for (let i = 0; i < allCells.length; i++) {
-      allCells[i].style.backgroundColor = 'rgb(255, 255, 255)';
-    }
-  }
-
-  function savePic() {
-    let pixels = document.getElementsByClassName('canvasCell');
-    storedArr.length = 0;
-    for (let i = 0; i < pixels.length; i++) {
-      storedArr.push(pixels[i])
-    }
-    console.log(storedArr[0])
-  }
-
-  function loadPic() {
-    let pixels = document.getElementsByClassName('canvasCell');
-    if (storedArr[1]) {
-      console.log('current' + pixels[0])
-      console.log('stored' + storedArr[0])
-      for (let i = 0; i < pixels.length; i++) {
-        // pixels[i] = storedArr[i]
-      }
-    }
-  }
-  // invoke to create buttons and colors
-  mkBtn('erase');
-  mkBtn('square');
-  mkBtn('triangle');
-  mkBtn('circle');
-  mkBtn('save');
-  mkBtn('load');
-  mkBtn('clear');
-  mkColors();
 })()
