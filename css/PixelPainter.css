@@ -1,0 +1,50 @@
+body{
+  background-image: url('https://stmed.net/sites/default/files/artistic-hd-wallpapers-32761-6669528.jpg');
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+#canvas{
+  border: 10px solid rgb(136, 167, 50);
+  border-radius: 10px;
+}
+h1{
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  text-align: center;
+}
+#pixelPainter{
+  display:flex;
+  flex-flow: row nowrap;
+  align-self: center;
+}
+#colorPicker{
+  width: 18vw;
+}
+.colors{
+  display: flex;
+  flex-flow: column nowrap;
+}
+.colorRow{
+  display: flex;
+  flex-flow: row nowrap;
+}
+.colorCell{
+  width: 3vw;
+  height:3vw;
+}
+.buttonControls{
+  display:flex;
+  flex-flow: row nowrap;
+}
+.buttonBox{
+  display:flex;
+  flex-flow: column nowrap;
+}
+.button{
+  width: 8vw;
+  height:3vw;
+  border-radius: 10px; 
+  text-align: center;
+  vertical-align: middle;
+  background-image: radial-gradient(lightgrey, grey)
+}
