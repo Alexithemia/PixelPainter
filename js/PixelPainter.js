@@ -5,6 +5,7 @@ const pixelPaint = (function () {
   let curTool = 'none';
   let count = 0;
   let undoArr = [];
+  let option = 'none';
 
   let canvas = document.createElement('canvas');
   canvas.id = 'canvas';
@@ -80,7 +81,11 @@ const pixelPaint = (function () {
     let btn = document.createElement('div');
     btn.className = 'button';
     btn.id = name;
-    btn.innerHTML = name;
+    // btn.innerHTML = name;
+    let icon = document.createElement('div');
+    icon.id = name + 'Icon';
+    icon.className = 'icon';
+    btn.appendChild(icon);
     if (num === 1) {
       btnBox1.appendChild(btn);
     } else if (num === 2) {
@@ -89,20 +94,34 @@ const pixelPaint = (function () {
   }
 
   mkBtn('erase', 1);
+  document.getElementById('eraseIcon').style.backgroundImage = "url('/assets/erase.svg')";
   document.getElementById('erase').addEventListener('click', function (event) {
     erase()
   });
+  mkBtn('fill', 1);
+  document.getElementById('fillIcon').style.backgroundImage = "url('/assets/paintbucket.png')";
+  document.getElementById('fill').addEventListener('click', function (event) {
+    fillBtn(event.target)
+  });
   mkBtn('line', 1);
+  document.getElementById('lineIcon').style.backgroundImage = "url('/assets/line.svg')";
   mkBtn('square', 1);
+  document.getElementById('squareIcon').style.backgroundImage = "url('/assets/square.svg')";
   mkBtn('triangle', 1);
+  document.getElementById('triangleIcon').style.backgroundImage = "url('/assets/triangle.svg')";
   mkBtn('circle', 1);
+  document.getElementById('circleIcon').style.backgroundImage = "url('/assets/circle.svg')";
   mkBtn('save', 2);
+  document.getElementById('saveIcon').style.backgroundImage = "url('/assets/save.png')";
   mkBtn('load', 2);
+  document.getElementById('loadIcon').style.backgroundImage = "url('/assets/load.png')";
   mkBtn('undo', 2);
+  document.getElementById('undoIcon').style.backgroundImage = "url('/assets/undo.svg')";
   document.getElementById('undo').addEventListener('click', function (event) {
     undo()
   });
   mkBtn('clear', 2);
+  document.getElementById('clearIcon').style.backgroundImage = "url('/assets/clear.svg')";
   document.getElementById('clear').addEventListener('click', function (event) {
     clearCanvas()
   });
@@ -114,9 +133,13 @@ const pixelPaint = (function () {
 
   canvas = document.getElementById('canvas');
   canvas.addEventListener('mousedown', function (e) {
-    paint = true;
-    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-    redraw();
+    if (option === 'fill') {
+      fill(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+    } else {
+      paint = true;
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+      redraw();
+    }
   });
 
   canvas.addEventListener('mousemove', (function (e) {
@@ -148,8 +171,8 @@ const pixelPaint = (function () {
   let paint;
 
   function addClick(x, y, dragging) {
-    clickX.push(x);
-    clickY.push(y);
+    clickX.push(x - 10);
+    clickY.push(y - 10);
     clickDrag.push(dragging);
     if (curTool === 'erase') {
       colorList.push('#ffffff')
@@ -187,6 +210,18 @@ const pixelPaint = (function () {
     }
   }
 
+  function fillBtn() {
+    if (option === 'fill') {
+      option = 'none'
+    } else {
+      option = 'fill';
+    }
+  }
+  function fill(x, y) {
+    console.log(x, y);
+
+  }
+
   function undo() {
     let undoNum = undoArr.pop();
     for (let i = 0; i < undoNum; i++) {
@@ -206,4 +241,4 @@ const pixelPaint = (function () {
     colorList.length = 0;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   }
-})()
+})();
